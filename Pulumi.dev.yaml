@@ -1,0 +1,9 @@
+config:
+  aws:accessKey:
+    secure: AAABAGykLczJMdSfVOhJPKj3UdL9Jj9f6CElCUS0Z5sZp+2Ct6hTcETbI9JpjTbRRX5rxw==
+  aws:region: us-east-1
+  aws:secretKey:
+    secure: AAABAEqCyAH4KsAea/09J8Buv+iXT+3cGRCHsXuXlQYb0MAcuVVaPLZpPrwlXEmrUTyqRjZfX10Bm0WowJ+ONMVQkHAxGQzM
+  kii-validator:keyName: wagmiKeyPair
+  kii-validator:validatorName: wagmi
+  kii-validator:walletName: wagmiWallet

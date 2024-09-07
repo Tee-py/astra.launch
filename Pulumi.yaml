@@ -1,0 +1,10 @@
+name: kii-validator
+runtime:
+  name: nodejs
+  options:
+    packagemanager: npm
+description: A Pulumi project to spin up a KII validator node on AWS
+config:
+  pulumi:tags:
+    value:
+      pulumi:template: aws-typescript
