@@ -1,0 +1,92 @@
+[project]
+name = "astra-launch-api"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi[standard]>=0.114.2",
+    "pydantic-settings>=2.5.2",
+    "pulumi-aws>=6.51.1",
+    "pulumi>=3.132.0",
+    "pymongo>=4.8.0",
+    "web3>=7.2.0",
+    "huey>=2.5.1",
+    "redis>=5.0.8",
+    "gevent>=24.2.1",
+    "gunicorn>=23.0.0",
+    "uvicorn-worker>=0.2.0",
+    "python-slugify>=8.0.4",
+]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.6.5",
+]
+
+[tool.ruff]
+include = ["packages/**/*.py"]
+line-length = 119
+
+[tool.ruff.format]
+quote-style = "single"
+docstring-code-format = true
+
+[tool.ruff.lint]
+exclude = ["**/protos/*.py"]
+select = [
+    "E",
+    "W",
+    "F",
+    "UP",
+    "B",
+    "SIM",
+    "I",
+    "N",
+    "ASYNC",
+    "S",
+    "BLE",
+    "FBT",
+    "A",
+    "COM",
+    "C4",
+    "DTZ",
+    "DJ",
+    "EM",
+    "EXE",
+    "ISC",
+    "ICN",
+    "LOG",
+    "G",
+    "INP",
+    "PIE",
+    "T20",
+    "PYI",
+    "PT",
+    "RSE",
+    "RET",
+    "SLF",
+    "TID",
+    "TCH",
+    "ARG",
+    "PTH",
+    "PL",
+    "TRY",
+    "FLY",
+    "PERF",
+    "FURB",
+    "RUF",
+]
+ignore = ["COM812", "ISC001", "DJ008", "PLR0913", "PLR2004", "RUF012", "ARG002", "TRY301", "TRY300", "TRY002", "T201", "EM101", "BLE001", "TRY003"]
+
+[tool.ruff.lint.isort]
+length-sort = true
+combine-as-imports = true
+length-sort-straight = true
+section-order = ["future", "standard-library", "third-party", "fastapi", "first-party", "local-folder"]
+
+[tool.ruff.lint.isort.sections]
+"fastapi" = ["fastapi"]
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 120

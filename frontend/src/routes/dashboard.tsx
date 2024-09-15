@@ -1,8 +1,11 @@
+import EmptyState from "@/components/empty-dashboard";
+import ErrorState from "@/components/error";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { useListNodes } from "@/lib/api";
 import { config } from "@/wagmi";
 import { Link, Outlet, createFileRoute, useLocation } from "@tanstack/react-router";
 import { signMessage } from "@wagmi/core";
@@ -59,30 +62,26 @@ const DashboardLayout = () => {
   const { disconnect } = useDisconnect();
   const { connect, connectors } = useConnect();
   const { address, isConnected } = useAccount();
-  const [isLoading, setIsLoading] = useState(true);
-  const [dashboardData, setDashboardData] = useState<Record<string, string | number> | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  const { data, isLoading, isError, refetch } = useListNodes(address);
 
   useEffect(() => {
-    const fetchDashboardData = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      setDashboardData({
-        totalNodes: 5,
-        activeNodes: 4,
-        totalCapacity: 500,
-        avgReqPerSec: 150,
-        uptime: 99.9,
-        avgResponseTime: 50,
-        totalValidators: 2,
-        networkCoverage: 1,
-      });
-      setIsLoading(false);
-    };
-
-    fetchDashboardData();
-  }, []);
+    if (isConnected) {
+      localStorage.getItem(`sig:${address}`) ? setIsAuthenticated(true) : setIsAuthenticated(false);
+    }
+  }, [address, isConnected]);
 
   if (isLoading) {
     return <SkeletonDashboard />;
+  }
+
+  if (isError) {
+    <ErrorState
+      title="Dashboard Info Not Found"
+      message="The dashboard information couldn't be loaded."
+      onRetry={() => refetch()}
+    />;
   }
 
   const handleConnect = async () => {
@@ -92,11 +91,12 @@ const DashboardLayout = () => {
         {
           async onSuccess({ accounts }) {
             const message = "Welcome to astra.launch! Please sign this message to continue";
-            const signature = signMessage(config, {
+            const signature = await signMessage(config, {
               account: accounts[0],
               message,
             });
-            localStorage.setItem(`sig:${accounts[0].toLowerCase()}`, `${accounts[0]}:${signature}`);
+            localStorage.setItem(`sig:${accounts[0]}`, `${accounts[0]}:${signature}`);
+            setIsAuthenticated(true);
           },
         },
       );
@@ -107,9 +107,10 @@ const DashboardLayout = () => {
 
   const handleDisconnect = () => {
     if (address) {
-      localStorage.removeItem(`sig:${address.toLowerCase()}`);
+      localStorage.removeItem(`sig:${address}`);
     }
     disconnect();
+    setIsAuthenticated(false);
     toast({ title: "Wallet disconnected successfully." });
   };
 
@@ -162,76 +163,72 @@ const DashboardLayout = () => {
         </div>
       </aside>
       <main className="flex-1 p-8 overflow-auto">
-        {location.pathname === "/dashboard" ? (
-          <div className="space-y-8">
-            <div className="flex justify-between items-center">
-              <h1 className="text-3xl font-bold">
-                Welcome back, {address?.slice(0, 6)}...{address?.slice(-4)}
-              </h1>
-              <Button asChild>
-                <Link to="/dashboard/validators">Manage Nodes</Link>
-              </Button>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard
-                title="Total Nodes"
-                value={dashboardData?.totalNodes ? dashboardData?.totalNodes : 0}
-                icon={Server}
-                description="Active and inactive nodes in your network"
-              />
-              <StatCard
-                title="Active Nodes"
-                value={dashboardData?.activeNodes ? dashboardData?.activeNodes : 0}
-                icon={Activity}
-                description="Currently operational nodes"
-              />
-              <StatCard
-                title="Total Capacity"
-                value={`${dashboardData?.totalCapacity} GB`}
-                icon={Database}
-                description="Combined storage across all nodes"
-              />
-              <StatCard
-                title="Network Coverage"
-                value={`${dashboardData?.networkCoverage} Region`}
-                icon={Globe}
-                description="Geographic distribution of your nodes"
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <PerformanceCard
-                title="Avg. Requests/s"
-                value={dashboardData?.avgReqPerSec ? dashboardData?.avgReqPerSec : 0}
-                icon={Zap}
-                description="Average requests handled per second"
-              />
-              <PerformanceCard
-                title="Uptime"
-                value={`${dashboardData?.uptime}%`}
-                icon={Clock}
-                description="Overall network availability"
-              />
-              <PerformanceCard
-                title="Avg. Response Time"
-                value={`${dashboardData?.avgResponseTime}ms`}
-                icon={CpuIcon}
-                description="Average time to process requests"
-              />
-            </div>
-            <div className="space-y-4">
-              <h2 className="text-2xl font-semibold">Validator Nodes</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <ValidatorCard
-                  title="Active Validators"
-                  value={dashboardData?.totalValidators ? dashboardData?.totalValidators : 0}
-                  description="Nodes securing the network"
+        {isConnected && isAuthenticated ? (
+          location.pathname === "/dashboard" ? (
+            <div className="space-y-8">
+              <div className="flex justify-between items-center">
+                <h1 className="text-3xl font-bold">
+                  Welcome back, {address?.slice(0, 6)}...{address?.slice(-4)}
+                </h1>
+                <Button asChild>
+                  <Link to="/dashboard/validators">Manage Nodes</Link>
+                </Button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <StatCard
+                  title="Total Nodes"
+                  value={data ? data.length : 0}
+                  icon={Server}
+                  description="Active and inactive nodes in your network"
                 />
-                <ValidatorTeaser />
+                <StatCard
+                  title="Active Nodes"
+                  value={data ? data.length : 0}
+                  icon={Activity}
+                  description="Currently operational nodes"
+                />
+                <StatCard
+                  title="Total Capacity"
+                  value={`${data ? data?.length * 100 : 0} GB`}
+                  icon={Database}
+                  description="Combined storage across all nodes"
+                />
+                <StatCard
+                  title="Network Coverage"
+                  value={"1 Region"}
+                  icon={Globe}
+                  description="Geographic distribution of your nodes"
+                />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <PerformanceCard
+                  title="Avg. Requests/s"
+                  value={"- req/s"}
+                  icon={Zap}
+                  description="Average requests handled per second"
+                />
+                <PerformanceCard title="Uptime" value={"- %"} icon={Clock} description="Overall network availability" />
+                <PerformanceCard
+                  title="Avg. Response Time"
+                  value={"- ms"}
+                  icon={CpuIcon}
+                  description="Average time to process requests"
+                />
+              </div>
+              <div className="space-y-4">
+                <h2 className="text-2xl font-semibold">Validator Nodes</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <ValidatorCard title="Active Validators" value={0} description="Nodes securing the network" />
+                  <ValidatorTeaser />
+                </div>
               </div>
             </div>
-          </div>
-        ) : null}
-        <Outlet />
+          ) : (
+            <Outlet />
+          )
+        ) : (
+          <EmptyState />
+        )}
       </main>
     </div>
   );
