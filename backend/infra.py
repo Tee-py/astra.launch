@@ -212,7 +212,7 @@ def deploy_node(
             log_entry['message'] = event.stdout_event.message
             add_to_database(log_entry)
 
-        elif event.diagnostic_event and event.diagnostic_event.severity in ['info#err', 'warning', 'error']:
+        elif event.diagnostic_event:
             log_entry['type'] = 'diagnostic'
             log_entry['severity'] = event.diagnostic_event.severity
             log_entry['message'] = event.diagnostic_event.message
