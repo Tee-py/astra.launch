@@ -130,7 +130,7 @@ const generateMockChartData = () => {
 const mockChartData = generateMockChartData();
 
 const ValidatorDetailPage: React.FC = () => {
-  const { validatorId: id } = Route.useParams();
+  // const { validatorId: id } = Route.useParams();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(true);
   const [node, setNode] = useState(mockNodeData);
@@ -163,7 +163,7 @@ const ValidatorDetailPage: React.FC = () => {
 
       return () => clearInterval(interval);
     }
-  }, []);
+  }, [node.status]);
 
   const handleStatusChange = (action: "pause" | "resume" | "delete") => {
     switch (action) {

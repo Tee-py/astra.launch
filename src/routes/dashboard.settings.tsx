@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { useToast } from "@/hooks/use-toast";
 import { createFileRoute } from "@tanstack/react-router";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
@@ -27,7 +26,6 @@ const SkeletonCard = () => (
 );
 
 function Settings() {
-  const { toast } = useToast();
   const [accessKey, setAccessKey] = useState("");
   const [secretKey, setSecretKey] = useState("");
   const [isSaving, setIsSaving] = useState(false);

@@ -175,13 +175,13 @@ const DashboardLayout = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <StatCard
                 title="Total Nodes"
-                value={dashboardData?.totalNodes}
+                value={dashboardData?.totalNodes ? dashboardData?.totalNodes : 0}
                 icon={Server}
                 description="Active and inactive nodes in your network"
               />
               <StatCard
                 title="Active Nodes"
-                value={dashboardData?.activeNodes}
+                value={dashboardData?.activeNodes ? dashboardData?.activeNodes : 0}
                 icon={Activity}
                 description="Currently operational nodes"
               />
@@ -201,7 +201,7 @@ const DashboardLayout = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <PerformanceCard
                 title="Avg. Requests/s"
-                value={dashboardData?.avgReqPerSec}
+                value={dashboardData?.avgReqPerSec ? dashboardData?.avgReqPerSec : 0}
                 icon={Zap}
                 description="Average requests handled per second"
               />
@@ -223,7 +223,7 @@ const DashboardLayout = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <ValidatorCard
                   title="Active Validators"
-                  value={dashboardData?.totalValidators}
+                  value={dashboardData?.totalValidators ? dashboardData?.totalValidators : 0}
                   description="Nodes securing the network"
                 />
                 <ValidatorTeaser />
