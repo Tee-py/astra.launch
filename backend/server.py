@@ -106,7 +106,6 @@ def create_node(
 
     deploy_node_task(
         node_id=node_id,
-        node_name=node.name,
         access_key=aws_access_key,
         secret_key=aws_secret_key,
         instance_type=node.instance_type,
@@ -151,7 +150,6 @@ def delete_node(
 
     destroy_node_task(
         node_id=str(result['_id']),
-        node_name=result['name'],
         access_key=current_user['settings']['aws_access_key'],
         secret_key=current_user['settings']['aws_secret_key'],
     )

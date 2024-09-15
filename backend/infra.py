@@ -197,13 +197,12 @@ EOF
 def deploy_node(
     db: Database,
     node_id: str,
-    node_name: str,
     access_key: str,
     secret_key: str,
     instance_type: str,
 ):
     def pulumi_program():
-        return create_node_deploy_program(instance_type, node_name)
+        return create_node_deploy_program(instance_type, node_id)
 
     def handle_event(event: automation.events.EngineEvent):
         log_entry = {'sequence': event.sequence, 'timestamp': event.timestamp}
@@ -243,7 +242,7 @@ def deploy_node(
             },
         )
 
-    stack = automation.create_or_select_stack(stack_name=node_id, project_name=node_name, program=pulumi_program)
+    stack = automation.create_or_select_stack(stack_name=node_id, project_name=node_id, program=pulumi_program)
     stack.set_config('aws:region', automation.ConfigValue('us-east-1'))
     stack.set_config('aws:accessKey', automation.ConfigValue(access_key, secret=True))
     stack.set_config('aws:secretKey', automation.ConfigValue(secret_key, secret=True))
@@ -280,12 +279,12 @@ def deploy_node(
         )
 
 
-def destroy_node(node_id: str, node_name: str, access_key: str, secret_key: str):
+def destroy_node(node_id: str, access_key: str, secret_key: str):
     # Create or select the stack
     stack = automation.select_stack(
         program=lambda: None,
         stack_name=node_id,
-        project_name=node_name,
+        project_name=node_id,
     )
 
     # Set AWS credentials

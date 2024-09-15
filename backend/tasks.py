@@ -12,11 +12,10 @@ db = get_database(
 
 
 @huey.task()
-def deploy_node_task(node_id: str, node_name: str, access_key: str, secret_key: str, instance_type: str):
+def deploy_node_task(node_id: str, access_key: str, secret_key: str, instance_type: str):
     deploy_node(
         db=db,
         node_id=node_id,
-        node_name=node_name,
         access_key=access_key,
         secret_key=secret_key,
         instance_type=instance_type,
@@ -24,10 +23,9 @@ def deploy_node_task(node_id: str, node_name: str, access_key: str, secret_key: 
 
 
 @huey.task()
-def destroy_node_task(node_id: str, node_name: str, access_key: str, secret_key: str):
+def destroy_node_task(node_id: str, access_key: str, secret_key: str):
     destroy_node(
         node_id=node_id,
-        node_name=node_name,
         access_key=access_key,
         secret_key=secret_key,
     )
