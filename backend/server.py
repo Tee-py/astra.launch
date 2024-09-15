@@ -141,18 +141,18 @@ def delete_node(
     node_id: str,
     current_user: Annotated[dict, Depends(get_or_create_user)],
 ):
-    result = db.nodes.find_one_and_delete(
+    result = db.nodes.delete_one(
         {
             '_id': ObjectId(node_id),
             'owner': current_user['address'],
         }
     )
-
-    destroy_node_task(
-        node_id=str(result['_id']),
-        access_key=current_user['settings']['aws_access_key'],
-        secret_key=current_user['settings']['aws_secret_key'],
-    )
+    if result.deleted_count != 0:
+        destroy_node_task(
+            node_id=node_id,
+            access_key=current_user['settings']['aws_access_key'],
+            secret_key=current_user['settings']['aws_secret_key'],
+        )
 
     return {'success': True, 'message': 'Node deleted successfully'}
 
